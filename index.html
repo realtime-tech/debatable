@@ -1,11 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Debatable - Debate Prep Toolkit</title>
-    <link rel="icon" type="image/png" href="/logo.png">
     <style>
         * {
             margin: 0;
@@ -239,6 +237,13 @@
             color: white;
         }
 
+        .add-buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
         .argument-list {
             display: grid;
             gap: 15px;
@@ -307,30 +312,10 @@
             font-weight: 500;
         }
 
-        .tag-contention {
-            background: #dbeafe;
-            color: #1e40af;
-        }
-
-        .tag-impact {
-            background: #fecaca;
-            color: #991b1b;
-        }
-
-        .tag-turn {
-            background: #d1fae5;
-            color: #065f46;
-        }
-
-        .tag-cx {
-            background: #e9d5ff;
-            color: #6b21a8;
-        }
-
-        .tag-evidence {
-            background: #fed7aa;
-            color: #9a3412;
-        }
+        .tag-contention { background: #dbeafe; color: #1e40af; }
+        .tag-turn { background: #d1fae5; color: #065f46; }
+        .tag-cx { background: #e9d5ff; color: #6b21a8; }
+        .tag-evidence { background: #fed7aa; color: #9a3412; }
 
         .modal {
             display: none;
@@ -437,6 +422,10 @@
             display: none;
         }
 
+        .argument-card.collapsed .evidence-impact-section {
+            display: none;
+        }
+
         .cx-followups {
             margin-top: 15px;
             padding-left: 20px;
@@ -484,6 +473,36 @@
             margin-top: 10px;
         }
 
+        .evidence-impact-section {
+            margin-top: 15px;
+            padding: 15px;
+            background: #fff7ed;
+            border-radius: 8px;
+            border-left: 3px solid #f97316;
+        }
+
+        .evidence-label {
+            font-weight: 600;
+            color: #9a3412;
+            margin-bottom: 5px;
+            font-size: 0.9em;
+        }
+
+        .impact-label {
+            font-weight: 600;
+            color: #991b1b;
+            margin-top: 10px;
+            margin-bottom: 5px;
+            font-size: 0.9em;
+        }
+
+        .contention-link {
+            font-size: 0.85em;
+            color: #667eea;
+            margin-top: 5px;
+            font-style: italic;
+        }
+
         .debate-card {
             background: #f9fafb;
             border: 2px solid #d1d5db;
@@ -506,6 +525,16 @@
             white-space: pre-wrap;
             line-height: 1.5;
             color: #374151;
+        }
+
+        .card-section {
+            margin-bottom: 15px;
+        }
+
+        .card-section-title {
+            font-weight: bold;
+            text-decoration: underline;
+            margin-bottom: 5px;
         }
 
         .view-card-btn {
@@ -537,16 +566,12 @@
         }
 
         @media print {
-
-            .btn,
-            .argument-actions,
-            .round-mode-toggle {
+            .btn, .argument-actions, .round-mode-toggle {
                 display: none;
             }
         }
     </style>
 </head>
-
 <body>
     <div class="container">
         <header>
@@ -555,8 +580,7 @@
         </header>
 
         <div class="main-controls">
-            <input type="text" class="search-bar" id="searchBar"
-                placeholder="🔍 Search arguments, questions, evidence...">
+            <input type="text" class="search-bar" id="searchBar" placeholder="🔍 Search arguments, questions, evidence...">
             <button class="btn btn-primary" onclick="openModal('addResolution')">+ New Resolution</button>
             <button class="btn btn-secondary" onclick="exportData()">📥 Export</button>
             <button class="btn btn-secondary" onclick="importData()">📤 Import</button>
@@ -565,7 +589,6 @@
         <div class="filters" id="filters">
             <button class="filter-btn active" data-filter="all">All</button>
             <button class="filter-btn" data-filter="contention">Contentions</button>
-            <button class="filter-btn" data-filter="impact">Impacts</button>
             <button class="filter-btn" data-filter="turn">Turns</button>
             <button class="filter-btn" data-filter="cx">CX Q&A</button>
             <button class="filter-btn" data-filter="evidence">Evidence</button>
@@ -603,37 +626,111 @@
         </div>
     </div>
 
-    <!-- Add Argument Modal -->
-    <div class="modal" id="addArgumentModal">
+    <!-- Add Contention Modal -->
+    <div class="modal" id="addContentionModal">
         <div class="modal-content">
-            <div class="modal-header">Add New Argument</div>
+            <div class="modal-header">Add New Contention</div>
             <div class="form-group">
                 <label>Title</label>
-                <input type="text" id="argumentTitle" placeholder="Argument title...">
+                <input type="text" id="contentionTitle" placeholder="Contention title...">
             </div>
             <div class="form-group">
                 <label>Content</label>
-                <textarea id="argumentContent" placeholder="Argument content..."></textarea>
-            </div>
-            <div class="form-group">
-                <label>Type</label>
-                <select id="argumentType">
-                    <option value="contention">Contention</option>
-                    <option value="impact">Impact</option>
-                    <option value="turn">Turn</option>
-                    <option value="cx">CX Q&A</option>
-                    <option value="evidence">Evidence</option>
-                </select>
+                <textarea id="contentionContent" placeholder="Contention content..."></textarea>
             </div>
             <div class="form-group">
                 <label>Side</label>
-                <select id="argumentSide">
+                <select id="contentionSide">
                     <option value="aff">Affirmative</option>
                     <option value="neg">Negative</option>
                 </select>
             </div>
             <div style="display: flex; gap: 10px;">
-                <button class="btn btn-primary" onclick="addArgument()">Add Argument</button>
+                <button class="btn btn-primary" onclick="addContention()">Add Contention</button>
+                <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Turn Modal -->
+    <div class="modal" id="addTurnModal">
+        <div class="modal-content">
+            <div class="modal-header">Add New Turn</div>
+            <div class="form-group">
+                <label>Title</label>
+                <input type="text" id="turnTitle" placeholder="Turn title...">
+            </div>
+            <div class="form-group">
+                <label>Content</label>
+                <textarea id="turnContent" placeholder="Turn content..."></textarea>
+            </div>
+            <div class="form-group">
+                <label>Side</label>
+                <select id="turnSide">
+                    <option value="aff">Affirmative</option>
+                    <option value="neg">Negative</option>
+                </select>
+            </div>
+            <div style="display: flex; gap: 10px;">
+                <button class="btn btn-primary" onclick="addTurn()">Add Turn</button>
+                <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add CX Modal -->
+    <div class="modal" id="addCXModal">
+        <div class="modal-content">
+            <div class="modal-header">Add CX Question</div>
+            <div class="form-group">
+                <label>Question</label>
+                <textarea id="cxQuestion" placeholder="Your CX question..."></textarea>
+            </div>
+            <div class="form-group">
+                <label>Side</label>
+                <select id="cxSide">
+                    <option value="aff">Affirmative</option>
+                    <option value="neg">Negative</option>
+                </select>
+            </div>
+            <div style="display: flex; gap: 10px;">
+                <button class="btn btn-primary" onclick="addCX()">Add CX</button>
+                <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Evidence Modal -->
+    <div class="modal" id="addEvidenceModal">
+        <div class="modal-content">
+            <div class="modal-header">Add Evidence + Impact</div>
+            <div class="form-group">
+                <label>Title/Tag</label>
+                <input type="text" id="evidenceTitle" placeholder="e.g., Smith 23 - Climate Warming">
+            </div>
+            <div class="form-group">
+                <label>Evidence</label>
+                <textarea id="evidenceContent" placeholder="Paste your evidence here..."></textarea>
+            </div>
+            <div class="form-group">
+                <label>Impact</label>
+                <textarea id="evidenceImpact" placeholder="Explain the impact..."></textarea>
+            </div>
+            <div class="form-group">
+                <label>Link to Contention</label>
+                <select id="evidenceContention">
+                    <option value="">-- Select Contention (Optional) --</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Side</label>
+                <select id="evidenceSide">
+                    <option value="aff">Affirmative</option>
+                    <option value="neg">Negative</option>
+                </select>
+            </div>
+            <div style="display: flex; gap: 10px;">
+                <button class="btn btn-primary" onclick="addEvidence()">Add Evidence</button>
                 <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
             </div>
         </div>
@@ -676,12 +773,10 @@
         <div class="modal-content">
             <div class="modal-header">Select Your Side for Round Mode</div>
             <div style="display: grid; gap: 15px; margin: 20px 0;">
-                <button class="btn btn-primary" style="padding: 30px; font-size: 1.2em;"
-                    onclick="startRoundMode('aff')">
+                <button class="btn btn-primary" style="padding: 30px; font-size: 1.2em;" onclick="startRoundMode('aff')">
                     Affirmative
                 </button>
-                <button class="btn btn-primary" style="padding: 30px; font-size: 1.2em;"
-                    onclick="startRoundMode('neg')">
+                <button class="btn btn-primary" style="padding: 30px; font-size: 1.2em;" onclick="startRoundMode('neg')">
                     Negative
                 </button>
             </div>
@@ -706,12 +801,31 @@
             currentModalAction = action;
             if (action === 'addResolution') {
                 document.getElementById('addResolutionModal').classList.add('active');
-            } else if (action === 'addArgument') {
+            } else if (action === 'addContention') {
                 if (!data.currentResolution) {
                     alert('Please select a resolution first!');
                     return;
                 }
-                document.getElementById('addArgumentModal').classList.add('active');
+                document.getElementById('addContentionModal').classList.add('active');
+            } else if (action === 'addTurn') {
+                if (!data.currentResolution) {
+                    alert('Please select a resolution first!');
+                    return;
+                }
+                document.getElementById('addTurnModal').classList.add('active');
+            } else if (action === 'addCX') {
+                if (!data.currentResolution) {
+                    alert('Please select a resolution first!');
+                    return;
+                }
+                document.getElementById('addCXModal').classList.add('active');
+            } else if (action === 'addEvidence') {
+                if (!data.currentResolution) {
+                    alert('Please select a resolution first!');
+                    return;
+                }
+                populateContentionDropdown();
+                document.getElementById('addEvidenceModal').classList.add('active');
             } else if (action === 'addFollowup') {
                 document.getElementById('addFollowupModal').classList.add('active');
             } else if (action === 'viewCard') {
@@ -729,7 +843,7 @@
         function addResolution() {
             const text = document.getElementById('resolutionText').value;
             const topic = document.getElementById('resolutionTopic').value;
-
+            
             if (!text) {
                 alert('Please enter resolution text');
                 return;
@@ -760,11 +874,10 @@
             renderResolutions();
         }
 
-        function addArgument() {
-            const title = document.getElementById('argumentTitle').value;
-            const content = document.getElementById('argumentContent').value;
-            const type = document.getElementById('argumentType').value;
-            const side = document.getElementById('argumentSide').value;
+        function addContention() {
+            const title = document.getElementById('contentionTitle').value;
+            const content = document.getElementById('contentionContent').value;
+            const side = document.getElementById('contentionSide').value;
 
             if (!title || !content) {
                 alert('Please fill in all fields');
@@ -775,10 +888,9 @@
                 id: Date.now(),
                 title: title,
                 content: content,
-                type: type,
+                type: 'contention',
                 pinned: false,
-                collapsed: false,
-                followups: []
+                collapsed: false
             };
 
             const resolution = data.resolutions.find(r => r.id === data.currentResolution);
@@ -790,11 +902,71 @@
                 }
             }
 
-            document.getElementById('argumentTitle').value = '';
-            document.getElementById('argumentContent').value = '';
+            document.getElementById('cxQuestion').value = '';
             closeModal();
             renderArguments();
         }
+
+        function populateContentionDropdown() {
+            const resolution = data.resolutions.find(r => r.id === data.currentResolution);
+            if (!resolution) return;
+
+            const side = document.getElementById('evidenceSide').value;
+            const args = side === 'aff' ? resolution.affArguments : resolution.negArguments;
+            const contentions = args.filter(a => a.type === 'contention');
+
+            const select = document.getElementById('evidenceContention');
+            select.innerHTML = '<option value="">-- Select Contention (Optional) --</option>';
+            
+            contentions.forEach(c => {
+                const option = document.createElement('option');
+                option.value = c.id;
+                option.textContent = c.title;
+                select.appendChild(option);
+            });
+        }
+
+        function addEvidence() {
+            const title = document.getElementById('evidenceTitle').value;
+            const evidence = document.getElementById('evidenceContent').value;
+            const impact = document.getElementById('evidenceImpact').value;
+            const contentionId = document.getElementById('evidenceContention').value;
+            const side = document.getElementById('evidenceSide').value;
+
+            if (!title || !evidence || !impact) {
+                alert('Please fill in title, evidence, and impact');
+                return;
+            }
+
+            const argument = {
+                id: Date.now(),
+                title: title,
+                content: evidence,
+                impact: impact,
+                contentionId: contentionId || null,
+                type: 'evidence',
+                pinned: false,
+                collapsed: false
+            };
+
+            const resolution = data.resolutions.find(r => r.id === data.currentResolution);
+            if (resolution) {
+                if (side === 'aff') {
+                    resolution.affArguments.push(argument);
+                } else {
+                    resolution.negArguments.push(argument);
+                }
+            }
+
+            document.getElementById('evidenceTitle').value = '';
+            document.getElementById('evidenceContent').value = '';
+            document.getElementById('evidenceImpact').value = '';
+            document.getElementById('evidenceContention').value = '';
+            closeModal();
+            renderArguments();
+        }
+
+        document.getElementById('evidenceSide').addEventListener('change', populateContentionDropdown);
 
         function openFollowupModal(argId) {
             data.currentArgumentForFollowup = argId;
@@ -844,16 +1016,32 @@
             const args = data.currentSide === 'aff' ? resolution.affArguments : resolution.negArguments;
             const arg = args.find(a => a.id === argId);
 
-            if (!arg) return;
+            if (!arg || arg.type !== 'evidence') return;
 
             data.currentCardArgument = arg;
+
+            let contentionName = 'N/A';
+            if (arg.contentionId) {
+                const contention = args.find(a => a.id === parseInt(arg.contentionId));
+                if (contention) contentionName = contention.title;
+            }
 
             let cardHtml = `
                 <div class="debate-card">
                     <div class="card-header">
-                        ${arg.title.toUpperCase()} [${arg.type.toUpperCase()}]
+                        ${arg.title.toUpperCase()}
                     </div>
-                    <div class="card-content">${arg.content}</div>
+                    <div class="card-section">
+                        <div class="card-section-title">EVIDENCE:</div>
+                        <div class="card-content">${arg.content}</div>
+                    </div>
+                    <div class="card-section">
+                        <div class="card-section-title">IMPACT:</div>
+                        <div class="card-content">${arg.impact}</div>
+                    </div>
+                    <div style="margin-top: 10px; font-size: 0.85em; color: #666;">
+                        Linked to: ${contentionName}
+                    </div>
                 </div>
             `;
 
@@ -865,7 +1053,16 @@
             const arg = data.currentCardArgument;
             if (!arg) return;
 
-            const cardText = `${arg.title.toUpperCase()} [${arg.type.toUpperCase()}]\n\n${arg.content}`;
+            const resolution = data.resolutions.find(r => r.id === data.currentResolution);
+            const args = data.currentSide === 'aff' ? resolution.affArguments : resolution.negArguments;
+            
+            let contentionName = 'N/A';
+            if (arg.contentionId) {
+                const contention = args.find(a => a.id === parseInt(arg.contentionId));
+                if (contention) contentionName = contention.title;
+            }
+
+            const cardText = `${arg.title.toUpperCase()}\n\nEVIDENCE:\n${arg.content}\n\nIMPACT:\n${arg.impact}\n\nLinked to: ${contentionName}`;
             navigator.clipboard.writeText(cardText).then(() => {
                 alert('Card copied to clipboard!');
             });
@@ -877,7 +1074,7 @@
 
         function renderResolutions() {
             const contentArea = document.getElementById('contentArea');
-
+            
             if (data.resolutions.length === 0) {
                 contentArea.innerHTML = `
                     <div class="empty-state">
@@ -913,7 +1110,7 @@
         function renderArguments() {
             const contentArea = document.getElementById('contentArea');
             const resolution = data.resolutions.find(r => r.id === data.currentResolution);
-
+            
             if (!resolution) {
                 renderResolutions();
                 return;
@@ -921,11 +1118,12 @@
 
             const args = data.currentSide === 'aff' ? resolution.affArguments : resolution.negArguments;
             const searchTerm = document.getElementById('searchBar').value.toLowerCase();
-
+            
             let filteredArgs = args.filter(arg => {
-                const matchesSearch = !searchTerm ||
-                    arg.title.toLowerCase().includes(searchTerm) ||
-                    arg.content.toLowerCase().includes(searchTerm);
+                const matchesSearch = !searchTerm || 
+                    arg.title.toLowerCase().includes(searchTerm) || 
+                    arg.content.toLowerCase().includes(searchTerm) ||
+                    (arg.impact && arg.impact.toLowerCase().includes(searchTerm));
                 const matchesFilter = data.filterType === 'all' || arg.type === data.filterType;
                 return matchesSearch && matchesFilter;
             });
@@ -937,95 +1135,119 @@
 
             if (data.roundMode) {
                 html += `
-            <div class="round-mode-banner">
-                🎯 ROUND MODE: ${data.currentSide === 'aff' ? 'AFFIRMATIVE' : 'NEGATIVE'}
-                <button class="btn btn-secondary btn-small" style="margin-left: 20px;" onclick="exitRoundMode()">Exit Round Mode</button>
-            </div>
-        `;
+                    <div class="round-mode-banner">
+                        🎯 ROUND MODE: ${data.currentSide === 'aff' ? 'AFFIRMATIVE' : 'NEGATIVE'}
+                        <button class="btn btn-secondary btn-small" style="margin-left: 20px;" onclick="exitRoundMode()">Exit Round Mode</button>
+                    </div>
+                `;
             } else {
                 html += `
-            <div style="margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center;">
-                <h2 style="color: #667eea;">${resolution.text}</h2>
-                <button class="btn btn-secondary" onclick="backToResolutions()">← Back</button>
-            </div>
-            <div class="side-tabs">
-                <div class="side-tab ${data.currentSide === 'aff' ? 'active' : ''}" onclick="switchSide('aff')">
-                    Affirmative (${resolution.affArguments.length})
-                </div>
-                <div class="side-tab ${data.currentSide === 'neg' ? 'active' : ''}" onclick="switchSide('neg')">
-                    Negative (${resolution.negArguments.length})
-                </div>
-            </div>
-            <button class="btn btn-primary" style="margin-bottom: 20px;" onclick="openModal('addArgument')">+ Add Argument</button>
-        `;
+                    <div style="margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center;">
+                        <h2 style="color: #667eea;">${resolution.text}</h2>
+                        <button class="btn btn-secondary" onclick="backToResolutions()">← Back</button>
+                    </div>
+                    <div class="side-tabs">
+                        <div class="side-tab ${data.currentSide === 'aff' ? 'active' : ''}" onclick="switchSide('aff')">
+                            Affirmative (${resolution.affArguments.length})
+                        </div>
+                        <div class="side-tab ${data.currentSide === 'neg' ? 'active' : ''}" onclick="switchSide('neg')">
+                            Negative (${resolution.negArguments.length})
+                        </div>
+                    </div>
+                    <div class="add-buttons">
+                        <button class="btn btn-primary" onclick="openModal('addContention')">+ Contention</button>
+                        <button class="btn btn-primary" onclick="openModal('addEvidence')">+ Evidence</button>
+                        <button class="btn btn-primary" onclick="openModal('addTurn')">+ Turn</button>
+                        <button class="btn btn-primary" onclick="openModal('addCX')">+ CX Question</button>
+                    </div>
+                `;
             }
 
             if (filteredArgs.length === 0) {
                 html += `
-            <div class="empty-state">
-                <div class="empty-state-icon">💭</div>
-                <h3>No arguments yet</h3>
-                <p>Add your first argument to get started</p>
-            </div>
-        `;
+                    <div class="empty-state">
+                        <div class="empty-state-icon">💭</div>
+                        <h3>No arguments yet</h3>
+                        <p>Add your first argument to get started</p>
+                    </div>
+                `;
             } else {
                 html += '<div class="argument-list">';
                 filteredArgs.forEach(arg => {
                     const pinnedClass = arg.pinned ? 'pinned' : '';
                     const collapsedClass = arg.collapsed ? 'collapsed' : '';
                     html += `
-                <div class="argument-card ${pinnedClass} ${collapsedClass}">
-                    <div class="argument-header">
-                        <div class="argument-title">${arg.title}</div>
-                        <div class="argument-actions">
-                            <button class="collapse-btn" onclick="toggleCollapse(${arg.id})">
-                                ${arg.collapsed ? '▼' : '▲'}
-                            </button>
-                            ${!data.roundMode ? `
-                                <button class="icon-btn" onclick="togglePin(${arg.id})" title="Pin">
-                                    ${arg.pinned ? '📌' : '📍'}
-                                </button>
-                                <button class="icon-btn" onclick="viewCard(${arg.id})" title="View Card">🃏</button>
-                                <button class="icon-btn" onclick="deleteArgument(${arg.id})" title="Delete">🗑️</button>
-                            ` : ''}
-                        </div>
-                    </div>
-                    <div class="argument-content">${arg.content}</div>
-                    <div class="tags">
-                        <span class="tag tag-${arg.type}">${arg.type.toUpperCase()}</span>
-                    </div>
-            `;
+                        <div class="argument-card ${pinnedClass} ${collapsedClass}">
+                            <div class="argument-header">
+                                <div class="argument-title">${arg.title}</div>
+                                <div class="argument-actions">
+                                    <button class="collapse-btn" onclick="toggleCollapse(${arg.id})">
+                                        ${arg.collapsed ? '▼' : '▲'}
+                                    </button>
+                                    ${!data.roundMode ? `
+                                        <button class="icon-btn" onclick="togglePin(${arg.id})" title="Pin">
+                                            ${arg.pinned ? '📌' : '📍'}
+                                        </button>
+                                        ${arg.type === 'evidence' ? `<button class="icon-btn" onclick="viewCard(${arg.id})" title="View Card">🃏</button>` : ''}
+                                        <button class="icon-btn" onclick="deleteArgument(${arg.id})" title="Delete">🗑️</button>
+                                    ` : ''}
+                                </div>
+                            </div>
+                    `;
+
+                    if (arg.type === 'evidence') {
+                        // Get contention name
+                        let contentionName = 'None';
+                        if (arg.contentionId) {
+                            const contention = args.find(a => a.id === parseInt(arg.contentionId));
+                            if (contention) contentionName = contention.title;
+                        }
+
+                        html += `
+                            <div class="evidence-impact-section">
+                                <div class="evidence-label">EVIDENCE:</div>
+                                <div style="color: #555; line-height: 1.4;">${arg.content}</div>
+                                <div class="impact-label">IMPACT:</div>
+                                <div style="color: #555; line-height: 1.4;">${arg.impact}</div>
+                                <div class="contention-link">↪ Linked to: ${contentionName}</div>
+                            </div>
+                        `;
+                    } else if (arg.content) {
+                        html += `<div class="argument-content">${arg.content}</div>`;
+                    }
+
+                    html += `<div class="tags"><span class="tag tag-${arg.type}">${arg.type.toUpperCase()}</span></div>`;
 
                     if (arg.type === 'cx' && arg.followups && arg.followups.length > 0) {
                         html += '<div class="cx-followups">';
                         arg.followups.forEach(followup => {
                             html += `
-                        <div class="cx-followup">
-                            ${!data.roundMode ? `
-                                <button class="delete-followup-btn" onclick="deleteFollowup(${arg.id}, ${followup.id})">×</button>
-                            ` : ''}
-                            <div class="cx-followup-label">If they say: "${followup.condition}"</div>
-                            <div class="cx-followup-content">${followup.response}</div>
-                        </div>
-                    `;
+                                <div class="cx-followup">
+                                    ${!data.roundMode ? `
+                                        <button class="delete-followup-btn" onclick="deleteFollowup(${arg.id}, ${followup.id})">×</button>
+                                    ` : ''}
+                                    <div class="cx-followup-label">If they say: "${followup.condition}"</div>
+                                    <div class="cx-followup-content">${followup.response}</div>
+                                </div>
+                            `;
                         });
                         html += '</div>';
                     }
 
                     if (arg.type === 'cx' && !data.roundMode) {
                         html += `
-                    <button class="btn btn-secondary btn-small add-followup-btn" onclick="openFollowupModal(${arg.id})">
-                        + Add Follow-up
-                    </button>
-                `;
+                            <button class="btn btn-secondary btn-small add-followup-btn" onclick="openFollowupModal(${arg.id})">
+                                + Add Follow-up
+                            </button>
+                        `;
                     }
 
-                    if (!data.roundMode) {
+                    if (arg.type === 'evidence' && !data.roundMode) {
                         html += `
-                    <button class="btn btn-secondary btn-small view-card-btn" onclick="viewCard(${arg.id})">
-                        📄 View as Card
-                    </button>
-                `;
+                            <button class="btn btn-secondary btn-small view-card-btn" onclick="viewCard(${arg.id})">
+                                🃏 View as Card
+                            </button>
+                        `;
                     }
 
                     html += '</div>';
@@ -1035,7 +1257,6 @@
 
             contentArea.innerHTML = html;
         }
-
 
         function backToResolutions() {
             data.currentResolution = null;
@@ -1152,5 +1373,4 @@
         renderResolutions();
     </script>
 </body>
-
 </html>
