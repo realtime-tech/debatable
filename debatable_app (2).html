@@ -1,0 +1,1155 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debatable - Debate Prep Toolkit</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        body.round-mode {
+            background: white;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        h1 {
+            font-size: 2.5em;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+
+        .tagline {
+            color: #666;
+            font-size: 1.1em;
+        }
+
+        .main-controls {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .search-bar {
+            flex: 1;
+            min-width: 300px;
+            padding: 15px 20px;
+            border: 2px solid #667eea;
+            border-radius: 12px;
+            font-size: 1em;
+            transition: all 0.3s;
+        }
+
+        .search-bar:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 12px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 600;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: #667eea;
+            border: 2px solid #667eea;
+        }
+
+        .btn-secondary:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-danger {
+            background: #ef4444;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #dc2626;
+        }
+
+        .btn-small {
+            padding: 6px 12px;
+            font-size: 0.85em;
+        }
+
+        .filters {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+
+        .filter-btn {
+            padding: 8px 16px;
+            border: 2px solid white;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .filter-btn.active {
+            background: white;
+            color: #667eea;
+        }
+
+        .round-mode .filters {
+            display: none;
+        }
+
+        .content-area {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            min-height: 500px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        .resolution-list {
+            display: grid;
+            gap: 15px;
+        }
+
+        .resolution-card {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            border-radius: 15px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid transparent;
+            position: relative;
+        }
+
+        .resolution-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
+            border-color: #667eea;
+        }
+
+        .resolution-card.active {
+            border-color: #667eea;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .resolution-title {
+            font-size: 1.3em;
+            font-weight: 600;
+            margin-bottom: 10px;
+            padding-right: 40px;
+        }
+
+        .resolution-meta {
+            font-size: 0.9em;
+            opacity: 0.8;
+        }
+
+        .delete-resolution-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: rgba(239, 68, 68, 0.9);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            cursor: pointer;
+            font-size: 1em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .delete-resolution-btn:hover {
+            background: #dc2626;
+            transform: scale(1.1);
+        }
+
+        .side-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .side-tab {
+            flex: 1;
+            padding: 15px;
+            border-radius: 12px;
+            text-align: center;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+            border: 2px solid #667eea;
+            background: white;
+            color: #667eea;
+        }
+
+        .side-tab.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .argument-list {
+            display: grid;
+            gap: 15px;
+        }
+
+        .argument-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            border-left: 4px solid #667eea;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s;
+        }
+
+        .argument-card:hover {
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .argument-card.pinned {
+            border-left-color: #f59e0b;
+            background: linear-gradient(to right, #fef3c7, white);
+        }
+
+        .argument-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .argument-title {
+            font-size: 1.2em;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .argument-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .icon-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1.2em;
+            padding: 5px;
+            transition: transform 0.2s;
+        }
+
+        .icon-btn:hover {
+            transform: scale(1.2);
+        }
+
+        .tags {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-top: 10px;
+        }
+
+        .tag {
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-size: 0.85em;
+            font-weight: 500;
+        }
+
+        .tag-contention {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .tag-impact {
+            background: #fecaca;
+            color: #991b1b;
+        }
+
+        .tag-turn {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .tag-cx {
+            background: #e9d5ff;
+            color: #6b21a8;
+        }
+
+        .tag-evidence {
+            background: #fed7aa;
+            color: #9a3412;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            font-size: 1.5em;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #667eea;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 1em;
+            font-family: inherit;
+        }
+
+        .form-group textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #999;
+        }
+
+        .empty-state-icon {
+            font-size: 4em;
+            margin-bottom: 20px;
+        }
+
+        .round-mode-toggle {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            z-index: 100;
+        }
+
+        .argument-content {
+            margin-top: 10px;
+            line-height: 1.6;
+            color: #555;
+        }
+
+        .collapse-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1.2em;
+            color: #667eea;
+        }
+
+        .argument-card.collapsed .argument-content {
+            display: none;
+        }
+
+        .argument-card.collapsed .tags {
+            display: none;
+        }
+
+        .argument-card.collapsed .cx-followups {
+            display: none;
+        }
+
+        .cx-followups {
+            margin-top: 15px;
+            padding-left: 20px;
+            border-left: 3px solid #e9d5ff;
+        }
+
+        .cx-followup {
+            margin-bottom: 15px;
+            padding: 10px;
+            background: #faf5ff;
+            border-radius: 8px;
+            position: relative;
+        }
+
+        .cx-followup-label {
+            font-weight: 600;
+            color: #6b21a8;
+            margin-bottom: 5px;
+            font-size: 0.9em;
+        }
+
+        .cx-followup-content {
+            color: #555;
+            line-height: 1.4;
+        }
+
+        .delete-followup-btn {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: #ef4444;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            font-size: 0.8em;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .add-followup-btn {
+            margin-top: 10px;
+        }
+
+        .debate-card {
+            background: #f9fafb;
+            border: 2px solid #d1d5db;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 15px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+        }
+
+        .card-header {
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #1f2937;
+            border-bottom: 2px solid #9ca3af;
+            padding-bottom: 5px;
+        }
+
+        .card-content {
+            white-space: pre-wrap;
+            line-height: 1.5;
+            color: #374151;
+        }
+
+        .view-card-btn {
+            margin-top: 10px;
+        }
+
+        .round-mode-banner {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-size: 1.2em;
+            font-weight: 600;
+        }
+
+        .round-mode .round-mode-banner {
+            display: block;
+        }
+
+        .round-mode .main-controls,
+        .round-mode header {
+            display: none;
+        }
+
+        .round-mode .argument-card {
+            page-break-inside: avoid;
+        }
+
+        @media print {
+
+            .btn,
+            .argument-actions,
+            .round-mode-toggle {
+                display: none;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <h1>⚖️ Debatable</h1>
+            <p class="tagline">Your debate brain, digitized and optimized</p>
+        </header>
+
+        <div class="main-controls">
+            <input type="text" class="search-bar" id="searchBar"
+                placeholder="🔍 Search arguments, questions, evidence...">
+            <button class="btn btn-primary" onclick="openModal('addResolution')">+ New Resolution</button>
+            <button class="btn btn-secondary" onclick="exportData()">📥 Export</button>
+            <button class="btn btn-secondary" onclick="importData()">📤 Import</button>
+        </div>
+
+        <div class="filters" id="filters">
+            <button class="filter-btn active" data-filter="all">All</button>
+            <button class="filter-btn" data-filter="contention">Contentions</button>
+            <button class="filter-btn" data-filter="impact">Impacts</button>
+            <button class="filter-btn" data-filter="turn">Turns</button>
+            <button class="filter-btn" data-filter="cx">CX Q&A</button>
+            <button class="filter-btn" data-filter="evidence">Evidence</button>
+        </div>
+
+        <div class="content-area" id="contentArea">
+            <div class="empty-state">
+                <div class="empty-state-icon">📝</div>
+                <h2>No Resolutions Yet</h2>
+                <p>Click "New Resolution" to get started with your debate prep</p>
+            </div>
+        </div>
+
+        <button class="btn btn-primary round-mode-toggle" onclick="toggleRoundMode()">
+            🎯 Round Mode
+        </button>
+    </div>
+
+    <!-- Add Resolution Modal -->
+    <div class="modal" id="addResolutionModal">
+        <div class="modal-content">
+            <div class="modal-header">Add New Resolution</div>
+            <div class="form-group">
+                <label>Resolution Text</label>
+                <textarea id="resolutionText" placeholder="Enter the resolution..."></textarea>
+            </div>
+            <div class="form-group">
+                <label>Topic Area</label>
+                <input type="text" id="resolutionTopic" placeholder="e.g., Policy, Value, LD">
+            </div>
+            <div style="display: flex; gap: 10px;">
+                <button class="btn btn-primary" onclick="addResolution()">Add Resolution</button>
+                <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Argument Modal -->
+    <div class="modal" id="addArgumentModal">
+        <div class="modal-content">
+            <div class="modal-header">Add New Argument</div>
+            <div class="form-group">
+                <label>Title</label>
+                <input type="text" id="argumentTitle" placeholder="Argument title...">
+            </div>
+            <div class="form-group">
+                <label>Content</label>
+                <textarea id="argumentContent" placeholder="Argument content..."></textarea>
+            </div>
+            <div class="form-group">
+                <label>Type</label>
+                <select id="argumentType">
+                    <option value="contention">Contention</option>
+                    <option value="impact">Impact</option>
+                    <option value="turn">Turn</option>
+                    <option value="cx">CX Q&A</option>
+                    <option value="evidence">Evidence</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Side</label>
+                <select id="argumentSide">
+                    <option value="aff">Affirmative</option>
+                    <option value="neg">Negative</option>
+                </select>
+            </div>
+            <div style="display: flex; gap: 10px;">
+                <button class="btn btn-primary" onclick="addArgument()">Add Argument</button>
+                <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add CX Followup Modal -->
+    <div class="modal" id="addFollowupModal">
+        <div class="modal-content">
+            <div class="modal-header">Add CX Follow-up</div>
+            <div class="form-group">
+                <label>If they say...</label>
+                <input type="text" id="followupCondition" placeholder="e.g., 'Yes' or 'We don't support that'">
+            </div>
+            <div class="form-group">
+                <label>Then respond with...</label>
+                <textarea id="followupResponse" placeholder="Your follow-up question or response..."></textarea>
+            </div>
+            <div style="display: flex; gap: 10px;">
+                <button class="btn btn-primary" onclick="addFollowup()">Add Follow-up</button>
+                <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- View Card Modal -->
+    <div class="modal" id="viewCardModal">
+        <div class="modal-content">
+            <div class="modal-header">Debate Card</div>
+            <div id="cardDisplay"></div>
+            <div style="display: flex; gap: 10px; margin-top: 20px;">
+                <button class="btn btn-primary" onclick="copyCard()">📋 Copy Card</button>
+                <button class="btn btn-secondary" onclick="printCard()">🖨️ Print Card</button>
+                <button class="btn btn-secondary" onclick="closeModal()">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Round Mode Side Selector Modal -->
+    <div class="modal" id="roundModeModal">
+        <div class="modal-content">
+            <div class="modal-header">Select Your Side for Round Mode</div>
+            <div style="display: grid; gap: 15px; margin: 20px 0;">
+                <button class="btn btn-primary" style="padding: 30px; font-size: 1.2em;"
+                    onclick="startRoundMode('aff')">
+                    Affirmative
+                </button>
+                <button class="btn btn-primary" style="padding: 30px; font-size: 1.2em;"
+                    onclick="startRoundMode('neg')">
+                    Negative
+                </button>
+            </div>
+            <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+        </div>
+    </div>
+
+    <script>
+        let data = {
+            resolutions: [],
+            currentResolution: null,
+            currentSide: 'aff',
+            filterType: 'all',
+            roundMode: false,
+            currentArgumentForFollowup: null,
+            currentCardArgument: null
+        };
+
+        let currentModalAction = null;
+
+        function openModal(action) {
+            currentModalAction = action;
+            if (action === 'addResolution') {
+                document.getElementById('addResolutionModal').classList.add('active');
+            } else if (action === 'addArgument') {
+                if (!data.currentResolution) {
+                    alert('Please select a resolution first!');
+                    return;
+                }
+                document.getElementById('addArgumentModal').classList.add('active');
+            } else if (action === 'addFollowup') {
+                document.getElementById('addFollowupModal').classList.add('active');
+            } else if (action === 'viewCard') {
+                document.getElementById('viewCardModal').classList.add('active');
+            } else if (action === 'roundMode') {
+                document.getElementById('roundModeModal').classList.add('active');
+            }
+        }
+
+        function closeModal() {
+            document.querySelectorAll('.modal').forEach(m => m.classList.remove('active'));
+            currentModalAction = null;
+        }
+
+        function addResolution() {
+            const text = document.getElementById('resolutionText').value;
+            const topic = document.getElementById('resolutionTopic').value;
+
+            if (!text) {
+                alert('Please enter resolution text');
+                return;
+            }
+
+            const resolution = {
+                id: Date.now(),
+                text: text,
+                topic: topic,
+                affArguments: [],
+                negArguments: []
+            };
+
+            data.resolutions.push(resolution);
+            document.getElementById('resolutionText').value = '';
+            document.getElementById('resolutionTopic').value = '';
+            closeModal();
+            renderResolutions();
+        }
+
+        function deleteResolution(e, resId) {
+            e.stopPropagation();
+            if (!confirm('Delete this resolution and all its arguments?')) return;
+            data.resolutions = data.resolutions.filter(r => r.id !== resId);
+            if (data.currentResolution === resId) {
+                data.currentResolution = null;
+            }
+            renderResolutions();
+        }
+
+        function addArgument() {
+            const title = document.getElementById('argumentTitle').value;
+            const content = document.getElementById('argumentContent').value;
+            const type = document.getElementById('argumentType').value;
+            const side = document.getElementById('argumentSide').value;
+
+            if (!title || !content) {
+                alert('Please fill in all fields');
+                return;
+            }
+
+            const argument = {
+                id: Date.now(),
+                title: title,
+                content: content,
+                type: type,
+                pinned: false,
+                collapsed: false,
+                followups: []
+            };
+
+            const resolution = data.resolutions.find(r => r.id === data.currentResolution);
+            if (resolution) {
+                if (side === 'aff') {
+                    resolution.affArguments.push(argument);
+                } else {
+                    resolution.negArguments.push(argument);
+                }
+            }
+
+            document.getElementById('argumentTitle').value = '';
+            document.getElementById('argumentContent').value = '';
+            closeModal();
+            renderArguments();
+        }
+
+        function openFollowupModal(argId) {
+            data.currentArgumentForFollowup = argId;
+            openModal('addFollowup');
+        }
+
+        function addFollowup() {
+            const condition = document.getElementById('followupCondition').value;
+            const response = document.getElementById('followupResponse').value;
+
+            if (!condition || !response) {
+                alert('Please fill in both fields');
+                return;
+            }
+
+            const resolution = data.resolutions.find(r => r.id === data.currentResolution);
+            const args = data.currentSide === 'aff' ? resolution.affArguments : resolution.negArguments;
+            const arg = args.find(a => a.id === data.currentArgumentForFollowup);
+
+            if (arg) {
+                arg.followups.push({
+                    id: Date.now(),
+                    condition: condition,
+                    response: response
+                });
+            }
+
+            document.getElementById('followupCondition').value = '';
+            document.getElementById('followupResponse').value = '';
+            closeModal();
+            renderArguments();
+        }
+
+        function deleteFollowup(argId, followupId) {
+            const resolution = data.resolutions.find(r => r.id === data.currentResolution);
+            const args = data.currentSide === 'aff' ? resolution.affArguments : resolution.negArguments;
+            const arg = args.find(a => a.id === argId);
+
+            if (arg) {
+                arg.followups = arg.followups.filter(f => f.id !== followupId);
+                renderArguments();
+            }
+        }
+
+        function viewCard(argId) {
+            const resolution = data.resolutions.find(r => r.id === data.currentResolution);
+            const args = data.currentSide === 'aff' ? resolution.affArguments : resolution.negArguments;
+            const arg = args.find(a => a.id === argId);
+
+            if (!arg) return;
+
+            data.currentCardArgument = arg;
+
+            let cardHtml = `
+                <div class="debate-card">
+                    <div class="card-header">
+                        ${arg.title.toUpperCase()} [${arg.type.toUpperCase()}]
+                    </div>
+                    <div class="card-content">${arg.content}</div>
+                </div>
+            `;
+
+            document.getElementById('cardDisplay').innerHTML = cardHtml;
+            openModal('viewCard');
+        }
+
+        function copyCard() {
+            const arg = data.currentCardArgument;
+            if (!arg) return;
+
+            const cardText = `${arg.title.toUpperCase()} [${arg.type.toUpperCase()}]\n\n${arg.content}`;
+            navigator.clipboard.writeText(cardText).then(() => {
+                alert('Card copied to clipboard!');
+            });
+        }
+
+        function printCard() {
+            window.print();
+        }
+
+        function renderResolutions() {
+            const contentArea = document.getElementById('contentArea');
+
+            if (data.resolutions.length === 0) {
+                contentArea.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📝</div>
+                        <h2>No Resolutions Yet</h2>
+                        <p>Click "New Resolution" to get started with your debate prep</p>
+                    </div>
+                `;
+                return;
+            }
+
+            let html = '<div class="resolution-list">';
+            data.resolutions.forEach(res => {
+                const isActive = res.id === data.currentResolution ? 'active' : '';
+                const argCount = res.affArguments.length + res.negArguments.length;
+                html += `
+                    <div class="resolution-card ${isActive}" onclick="selectResolution(${res.id})">
+                        <button class="delete-resolution-btn" onclick="deleteResolution(event, ${res.id})">×</button>
+                        <div class="resolution-title">${res.text}</div>
+                        <div class="resolution-meta">${res.topic} • ${argCount} arguments</div>
+                    </div>
+                `;
+            });
+            html += '</div>';
+            contentArea.innerHTML = html;
+        }
+
+        function selectResolution(id) {
+            data.currentResolution = id;
+            renderArguments();
+        }
+
+        function renderArguments() {
+            const contentArea = document.getElementById('contentArea');
+            const resolution = data.resolutions.find(r => r.id === data.currentResolution);
+
+            if (!resolution) {
+                renderResolutions();
+                return;
+            }
+
+            const args = data.currentSide === 'aff' ? resolution.affArguments : resolution.negArguments;
+            const searchTerm = document.getElementById('searchBar').value.toLowerCase();
+
+            let filteredArgs = args.filter(arg => {
+                const matchesSearch = !searchTerm ||
+                    arg.title.toLowerCase().includes(searchTerm) ||
+                    arg.content.toLowerCase().includes(searchTerm);
+                const matchesFilter = data.filterType === 'all' || arg.type === data.filterType;
+                return matchesSearch && matchesFilter;
+            });
+
+            // Sort: pinned first
+            filteredArgs.sort((a, b) => (b.pinned ? 1 : 0) - (a.pinned ? 1 : 0));
+
+            let html = '';
+
+            if (data.roundMode) {
+                html += `
+            <div class="round-mode-banner">
+                🎯 ROUND MODE: ${data.currentSide === 'aff' ? 'AFFIRMATIVE' : 'NEGATIVE'}
+                <button class="btn btn-secondary btn-small" style="margin-left: 20px;" onclick="exitRoundMode()">Exit Round Mode</button>
+            </div>
+        `;
+            } else {
+                html += `
+            <div style="margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center;">
+                <h2 style="color: #667eea;">${resolution.text}</h2>
+                <button class="btn btn-secondary" onclick="backToResolutions()">← Back</button>
+            </div>
+            <div class="side-tabs">
+                <div class="side-tab ${data.currentSide === 'aff' ? 'active' : ''}" onclick="switchSide('aff')">
+                    Affirmative (${resolution.affArguments.length})
+                </div>
+                <div class="side-tab ${data.currentSide === 'neg' ? 'active' : ''}" onclick="switchSide('neg')">
+                    Negative (${resolution.negArguments.length})
+                </div>
+            </div>
+            <button class="btn btn-primary" style="margin-bottom: 20px;" onclick="openModal('addArgument')">+ Add Argument</button>
+        `;
+            }
+
+            if (filteredArgs.length === 0) {
+                html += `
+            <div class="empty-state">
+                <div class="empty-state-icon">💭</div>
+                <h3>No arguments yet</h3>
+                <p>Add your first argument to get started</p>
+            </div>
+        `;
+            } else {
+                html += '<div class="argument-list">';
+                filteredArgs.forEach(arg => {
+                    const pinnedClass = arg.pinned ? 'pinned' : '';
+                    const collapsedClass = arg.collapsed ? 'collapsed' : '';
+                    html += `
+                <div class="argument-card ${pinnedClass} ${collapsedClass}">
+                    <div class="argument-header">
+                        <div class="argument-title">${arg.title}</div>
+                        <div class="argument-actions">
+                            <button class="collapse-btn" onclick="toggleCollapse(${arg.id})">
+                                ${arg.collapsed ? '▼' : '▲'}
+                            </button>
+                            ${!data.roundMode ? `
+                                <button class="icon-btn" onclick="togglePin(${arg.id})" title="Pin">
+                                    ${arg.pinned ? '📌' : '📍'}
+                                </button>
+                                <button class="icon-btn" onclick="viewCard(${arg.id})" title="View Card">🃏</button>
+                                <button class="icon-btn" onclick="deleteArgument(${arg.id})" title="Delete">🗑️</button>
+                            ` : ''}
+                        </div>
+                    </div>
+                    <div class="argument-content">${arg.content}</div>
+                    <div class="tags">
+                        <span class="tag tag-${arg.type}">${arg.type.toUpperCase()}</span>
+                    </div>
+            `;
+
+                    if (arg.type === 'cx' && arg.followups && arg.followups.length > 0) {
+                        html += '<div class="cx-followups">';
+                        arg.followups.forEach(followup => {
+                            html += `
+                        <div class="cx-followup">
+                            ${!data.roundMode ? `
+                                <button class="delete-followup-btn" onclick="deleteFollowup(${arg.id}, ${followup.id})">×</button>
+                            ` : ''}
+                            <div class="cx-followup-label">If they say: "${followup.condition}"</div>
+                            <div class="cx-followup-content">${followup.response}</div>
+                        </div>
+                    `;
+                        });
+                        html += '</div>';
+                    }
+
+                    if (arg.type === 'cx' && !data.roundMode) {
+                        html += `
+                    <button class="btn btn-secondary btn-small add-followup-btn" onclick="openFollowupModal(${arg.id})">
+                        + Add Follow-up
+                    </button>
+                `;
+                    }
+
+                    if (!data.roundMode) {
+                        html += `
+                    <button class="btn btn-secondary btn-small view-card-btn" onclick="viewCard(${arg.id})">
+                        📄 View as Card
+                    </button>
+                `;
+                    }
+
+                    html += '</div>';
+                });
+                html += '</div>';
+            }
+
+            contentArea.innerHTML = html;
+        }
+
+
+        function backToResolutions() {
+            data.currentResolution = null;
+            renderResolutions();
+        }
+
+        function switchSide(side) {
+            data.currentSide = side;
+            renderArguments();
+        }
+
+        function togglePin(argId) {
+            const resolution = data.resolutions.find(r => r.id === data.currentResolution);
+            const args = data.currentSide === 'aff' ? resolution.affArguments : resolution.negArguments;
+            const arg = args.find(a => a.id === argId);
+            if (arg) {
+                arg.pinned = !arg.pinned;
+                renderArguments();
+            }
+        }
+
+        function toggleCollapse(argId) {
+            const resolution = data.resolutions.find(r => r.id === data.currentResolution);
+            const args = data.currentSide === 'aff' ? resolution.affArguments : resolution.negArguments;
+            const arg = args.find(a => a.id === argId);
+            if (arg) {
+                arg.collapsed = !arg.collapsed;
+                renderArguments();
+            }
+        }
+
+        function deleteArgument(argId) {
+            if (!confirm('Delete this argument?')) return;
+            const resolution = data.resolutions.find(r => r.id === data.currentResolution);
+            if (data.currentSide === 'aff') {
+                resolution.affArguments = resolution.affArguments.filter(a => a.id !== argId);
+            } else {
+                resolution.negArguments = resolution.negArguments.filter(a => a.id !== argId);
+            }
+            renderArguments();
+        }
+
+        function toggleRoundMode() {
+            if (!data.currentResolution) {
+                alert('Please select a resolution first!');
+                return;
+            }
+            openModal('roundMode');
+        }
+
+        function startRoundMode(side) {
+            data.roundMode = true;
+            data.currentSide = side;
+            document.body.classList.add('round-mode');
+            closeModal();
+            renderArguments();
+        }
+
+        function exitRoundMode() {
+            data.roundMode = false;
+            document.body.classList.remove('round-mode');
+            renderArguments();
+        }
+
+        function exportData() {
+            const jsonData = JSON.stringify(data.resolutions, null, 2);
+            const blob = new Blob([jsonData], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'debatable-export.json';
+            a.click();
+        }
+
+        function importData() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.json';
+            input.onchange = e => {
+                const file = e.target.files[0];
+                const reader = new FileReader();
+                reader.onload = event => {
+                    try {
+                        const imported = JSON.parse(event.target.result);
+                        data.resolutions = imported;
+                        renderResolutions();
+                        alert('Import successful!');
+                    } catch (err) {
+                        alert('Error importing file');
+                    }
+                };
+                reader.readAsText(file);
+            };
+            input.click();
+        }
+
+        document.getElementById('searchBar').addEventListener('input', () => {
+            if (data.currentResolution) {
+                renderArguments();
+            }
+        });
+
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                data.filterType = btn.dataset.filter;
+                if (data.currentResolution) {
+                    renderArguments();
+                }
+            });
+        });
+
+        renderResolutions();
+    </script>
+</body>
+
+</html>
