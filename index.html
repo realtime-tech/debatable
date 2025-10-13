@@ -3,7 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" type="image/png" href="https://avatars.githubusercontent.com/realtime-tech?s=64">
     <title>Debatable - Debate Prep Toolkit</title>
     <style>
         * {
@@ -116,6 +115,15 @@
         .btn-small {
             padding: 6px 12px;
             font-size: 0.85em;
+        }
+
+        .btn-success {
+            background: #10b981;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #059669;
         }
 
         .filters {
@@ -268,6 +276,16 @@
             background: linear-gradient(to right, #fef3c7, white);
         }
 
+        .argument-card.opponent-used {
+            border-left-color: #ef4444;
+            background: linear-gradient(to right, #fee2e2, white);
+        }
+
+        .argument-card.rebuttal {
+            border-left-color: #10b981;
+            background: linear-gradient(to right, #d1fae5, white);
+        }
+
         .argument-header {
             display: flex;
             justify-content: space-between;
@@ -317,6 +335,7 @@
         .tag-turn { background: #d1fae5; color: #065f46; }
         .tag-cx { background: #e9d5ff; color: #6b21a8; }
         .tag-evidence { background: #fed7aa; color: #9a3412; }
+        .tag-rebuttal { background: #dcfce7; color: #166534; }
 
         .modal {
             display: none;
@@ -427,6 +446,10 @@
             display: none;
         }
 
+        .argument-card.collapsed .rebuttal-info {
+            display: none;
+        }
+
         .cx-followups {
             margin-top: 15px;
             padding-left: 20px;
@@ -504,6 +527,28 @@
             font-style: italic;
         }
 
+        .rebuttal-info {
+            margin-top: 15px;
+            padding: 15px;
+            background: #f0fdf4;
+            border-radius: 8px;
+            border-left: 3px solid #10b981;
+        }
+
+        .rebuttal-label {
+            font-weight: 600;
+            color: #166534;
+            margin-bottom: 5px;
+            font-size: 0.9em;
+        }
+
+        .rebuttal-target {
+            font-size: 0.85em;
+            color: #059669;
+            font-style: italic;
+            margin-top: 5px;
+        }
+
         .debate-card {
             background: #f9fafb;
             border: 2px solid #d1d5db;
@@ -553,8 +598,60 @@
             font-weight: 600;
         }
 
-        .round-mode .round-mode-banner {
-            display: block;
+        .round-mode-controls {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+
+        .opponent-tracker {
+            background: #fee2e2;
+            border: 2px solid #ef4444;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .opponent-tracker h3 {
+            color: #991b1b;
+            margin-bottom: 15px;
+            font-size: 1.2em;
+        }
+
+        .opponent-arg-list {
+            display: grid;
+            gap: 10px;
+        }
+
+        .opponent-arg-item {
+            background: white;
+            padding: 12px;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-left: 3px solid #ef4444;
+        }
+
+        .opponent-arg-title {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .rebuttal-match {
+            background: #dcfce7;
+            padding: 10px;
+            border-radius: 8px;
+            margin-top: 8px;
+            border-left: 3px solid #10b981;
+        }
+
+        .rebuttal-match-title {
+            font-weight: 600;
+            color: #166534;
+            font-size: 0.9em;
         }
 
         .round-mode .main-controls,
@@ -593,6 +690,7 @@
             <button class="filter-btn" data-filter="turn">Turns</button>
             <button class="filter-btn" data-filter="cx">CX Q&A</button>
             <button class="filter-btn" data-filter="evidence">Evidence</button>
+            <button class="filter-btn" data-filter="rebuttal">Rebuttals</button>
         </div>
 
         <div class="content-area" id="contentArea">
@@ -737,6 +835,38 @@
         </div>
     </div>
 
+    <!-- Add Rebuttal Modal -->
+    <div class="modal" id="addRebuttalModal">
+        <div class="modal-content">
+            <div class="modal-header">Add Rebuttal</div>
+            <div class="form-group">
+                <label>Rebuttal Title</label>
+                <input type="text" id="rebuttalTitle" placeholder="e.g., Turn on their security arg">
+            </div>
+            <div class="form-group">
+                <label>Rebuttal Content</label>
+                <textarea id="rebuttalContent" placeholder="Your rebuttal argument..."></textarea>
+            </div>
+            <div class="form-group">
+                <label>Target Opponent Argument</label>
+                <select id="rebuttalTarget">
+                    <option value="">-- Select Opponent Argument --</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Your Side</label>
+                <select id="rebuttalSide">
+                    <option value="aff">Affirmative</option>
+                    <option value="neg">Negative</option>
+                </select>
+            </div>
+            <div style="display: flex; gap: 10px;">
+                <button class="btn btn-primary" onclick="addRebuttal()">Add Rebuttal</button>
+                <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Add CX Followup Modal -->
     <div class="modal" id="addFollowupModal">
         <div class="modal-content">
@@ -785,6 +915,18 @@
         </div>
     </div>
 
+    <!-- Mark Opponent Argument Modal -->
+    <div class="modal" id="markOpponentModal">
+        <div class="modal-content">
+            <div class="modal-header">Select Opponent Arguments They Used</div>
+            <div id="opponentArgList" style="max-height: 400px; overflow-y: auto;"></div>
+            <div style="display: flex; gap: 10px; margin-top: 20px;">
+                <button class="btn btn-primary" onclick="saveOpponentMarks()">Save Selection</button>
+                <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         let data = {
             resolutions: [],
@@ -793,7 +935,8 @@
             filterType: 'all',
             roundMode: false,
             currentArgumentForFollowup: null,
-            currentCardArgument: null
+            currentCardArgument: null,
+            opponentUsedArgs: []
         };
 
         let currentModalAction = null;
@@ -827,12 +970,22 @@
                 }
                 populateContentionDropdown();
                 document.getElementById('addEvidenceModal').classList.add('active');
+            } else if (action === 'addRebuttal') {
+                if (!data.currentResolution) {
+                    alert('Please select a resolution first!');
+                    return;
+                }
+                populateRebuttalTargets();
+                document.getElementById('addRebuttalModal').classList.add('active');
             } else if (action === 'addFollowup') {
                 document.getElementById('addFollowupModal').classList.add('active');
             } else if (action === 'viewCard') {
                 document.getElementById('viewCardModal').classList.add('active');
             } else if (action === 'roundMode') {
                 document.getElementById('roundModeModal').classList.add('active');
+            } else if (action === 'markOpponent') {
+                populateOpponentArgList();
+                document.getElementById('markOpponentModal').classList.add('active');
             }
         }
 
@@ -903,6 +1056,74 @@
                 }
             }
 
+            document.getElementById('contentionTitle').value = '';
+            document.getElementById('contentionContent').value = '';
+            closeModal();
+            renderArguments();
+        }
+
+        function addTurn() {
+            const title = document.getElementById('turnTitle').value;
+            const content = document.getElementById('turnContent').value;
+            const side = document.getElementById('turnSide').value;
+
+            if (!title || !content) {
+                alert('Please fill in all fields');
+                return;
+            }
+
+            const argument = {
+                id: Date.now(),
+                title: title,
+                content: content,
+                type: 'turn',
+                pinned: false,
+                collapsed: false
+            };
+
+            const resolution = data.resolutions.find(r => r.id === data.currentResolution);
+            if (resolution) {
+                if (side === 'aff') {
+                    resolution.affArguments.push(argument);
+                } else {
+                    resolution.negArguments.push(argument);
+                }
+            }
+
+            document.getElementById('turnTitle').value = '';
+            document.getElementById('turnContent').value = '';
+            closeModal();
+            renderArguments();
+        }
+
+        function addCX() {
+            const question = document.getElementById('cxQuestion').value;
+            const side = document.getElementById('cxSide').value;
+
+            if (!question) {
+                alert('Please enter a question');
+                return;
+            }
+
+            const argument = {
+                id: Date.now(),
+                title: question,
+                content: '',
+                type: 'cx',
+                pinned: false,
+                collapsed: false,
+                followups: []
+            };
+
+            const resolution = data.resolutions.find(r => r.id === data.currentResolution);
+            if (resolution) {
+                if (side === 'aff') {
+                    resolution.affArguments.push(argument);
+                } else {
+                    resolution.negArguments.push(argument);
+                }
+            }
+
             document.getElementById('cxQuestion').value = '';
             closeModal();
             renderArguments();
@@ -923,6 +1144,25 @@
                 const option = document.createElement('option');
                 option.value = c.id;
                 option.textContent = c.title;
+                select.appendChild(option);
+            });
+        }
+
+        function populateRebuttalTargets() {
+            const resolution = data.resolutions.find(r => r.id === data.currentResolution);
+            if (!resolution) return;
+
+            const side = document.getElementById('rebuttalSide').value;
+            const opponentSide = side === 'aff' ? 'neg' : 'aff';
+            const opponentArgs = opponentSide === 'aff' ? resolution.affArguments : resolution.negArguments;
+
+            const select = document.getElementById('rebuttalTarget');
+            select.innerHTML = '<option value="">-- Select Opponent Argument --</option>';
+            
+            opponentArgs.forEach(arg => {
+                const option = document.createElement('option');
+                option.value = arg.id;
+                option.textContent = `[${arg.type.toUpperCase()}] ${arg.title}`;
                 select.appendChild(option);
             });
         }
@@ -967,7 +1207,45 @@
             renderArguments();
         }
 
+        function addRebuttal() {
+            const title = document.getElementById('rebuttalTitle').value;
+            const content = document.getElementById('rebuttalContent').value;
+            const targetId = document.getElementById('rebuttalTarget').value;
+            const side = document.getElementById('rebuttalSide').value;
+
+            if (!title || !content || !targetId) {
+                alert('Please fill in all fields');
+                return;
+            }
+
+            const argument = {
+                id: Date.now(),
+                title: title,
+                content: content,
+                type: 'rebuttal',
+                targetArgId: parseInt(targetId),
+                pinned: false,
+                collapsed: false
+            };
+
+            const resolution = data.resolutions.find(r => r.id === data.currentResolution);
+            if (resolution) {
+                if (side === 'aff') {
+                    resolution.affArguments.push(argument);
+                } else {
+                    resolution.negArguments.push(argument);
+                }
+            }
+
+            document.getElementById('rebuttalTitle').value = '';
+            document.getElementById('rebuttalContent').value = '';
+            document.getElementById('rebuttalTarget').value = '';
+            closeModal();
+            renderArguments();
+        }
+
         document.getElementById('evidenceSide').addEventListener('change', populateContentionDropdown);
+        document.getElementById('rebuttalSide').addEventListener('change', populateRebuttalTargets);
 
         function openFollowupModal(argId) {
             data.currentArgumentForFollowup = argId;
@@ -988,6 +1266,7 @@
             const arg = args.find(a => a.id === data.currentArgumentForFollowup);
 
             if (arg) {
+                if (!arg.followups) arg.followups = [];
                 arg.followups.push({
                     id: Date.now(),
                     condition: condition,
@@ -1006,10 +1285,57 @@
             const args = data.currentSide === 'aff' ? resolution.affArguments : resolution.negArguments;
             const arg = args.find(a => a.id === argId);
 
-            if (arg) {
+            if (arg && arg.followups) {
                 arg.followups = arg.followups.filter(f => f.id !== followupId);
                 renderArguments();
             }
+        }
+
+        function populateOpponentArgList() {
+            const resolution = data.resolutions.find(r => r.id === data.currentResolution);
+            if (!resolution) return;
+
+            const opponentSide = data.currentSide === 'aff' ? 'neg' : 'aff';
+            const opponentArgs = opponentSide === 'aff' ? resolution.affArguments : resolution.negArguments;
+
+            const listDiv = document.getElementById('opponentArgList');
+            listDiv.innerHTML = '';
+
+            opponentArgs.forEach(arg => {
+                const div = document.createElement('div');
+                div.style.padding = '10px';
+                div.style.marginBottom = '10px';
+                div.style.background = '#f3f4f6';
+                div.style.borderRadius = '8px';
+                
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.id = `opp-${arg.id}`;
+                checkbox.value = arg.id;
+                checkbox.checked = data.opponentUsedArgs.includes(arg.id);
+                checkbox.style.marginRight = '10px';
+
+                const label = document.createElement('label');
+                label.htmlFor = `opp-${arg.id}`;
+                label.textContent = `[${arg.type.toUpperCase()}] ${arg.title}`;
+                label.style.cursor = 'pointer';
+
+                div.appendChild(checkbox);
+                div.appendChild(label);
+                listDiv.appendChild(div);
+            });
+        }
+
+        function saveOpponentMarks() {
+            const checkboxes = document.querySelectorAll('#opponentArgList input[type="checkbox"]');
+            data.opponentUsedArgs = [];
+            checkboxes.forEach(cb => {
+                if (cb.checked) {
+                    data.opponentUsedArgs.push(parseInt(cb.value));
+                }
+            });
+            closeModal();
+            renderArguments();
         }
 
         function viewCard(argId) {
@@ -1105,7 +1431,16 @@
 
         function selectResolution(id) {
             data.currentResolution = id;
+            data.opponentUsedArgs = [];
             renderArguments();
+        }
+
+        function getRebuttalForArg(argId) {
+            const resolution = data.resolutions.find(r => r.id === data.currentResolution);
+            if (!resolution) return null;
+
+            const myArgs = data.currentSide === 'aff' ? resolution.affArguments : resolution.negArguments;
+            return myArgs.find(a => a.type === 'rebuttal' && a.targetArgId === argId);
         }
 
         function renderArguments() {
@@ -1118,6 +1453,8 @@
             }
 
             const args = data.currentSide === 'aff' ? resolution.affArguments : resolution.negArguments;
+            const opponentSide = data.currentSide === 'aff' ? 'neg' : 'aff';
+            const opponentArgs = opponentSide === 'aff' ? resolution.affArguments : resolution.negArguments;
             const searchTerm = document.getElementById('searchBar').value.toLowerCase();
             
             let filteredArgs = args.filter(arg => {
@@ -1129,7 +1466,6 @@
                 return matchesSearch && matchesFilter;
             });
 
-            // Sort: pinned first
             filteredArgs.sort((a, b) => (b.pinned ? 1 : 0) - (a.pinned ? 1 : 0));
 
             let html = '';
@@ -1138,9 +1474,54 @@
                 html += `
                     <div class="round-mode-banner">
                         🎯 ROUND MODE: ${data.currentSide === 'aff' ? 'AFFIRMATIVE' : 'NEGATIVE'}
-                        <button class="btn btn-secondary btn-small" style="margin-left: 20px;" onclick="exitRoundMode()">Exit Round Mode</button>
+                        <div class="round-mode-controls">
+                            <button class="btn btn-secondary btn-small" onclick="openModal('markOpponent')">📝 Mark Opponent Args</button>
+                            <button class="btn btn-secondary btn-small" onclick="exitRoundMode()">Exit Round Mode</button>
+                        </div>
                     </div>
                 `;
+
+                if (data.opponentUsedArgs.length > 0) {
+                    html += `
+                        <div class="opponent-tracker">
+                            <h3>🎯 Opponent Arguments They Used</h3>
+                            <div class="opponent-arg-list">
+                    `;
+
+                    data.opponentUsedArgs.forEach(oppArgId => {
+                        const oppArg = opponentArgs.find(a => a.id === oppArgId);
+                        if (oppArg) {
+                            const myRebuttal = getRebuttalForArg(oppArgId);
+                            html += `
+                                <div class="opponent-arg-item">
+                                    <div>
+                                        <div class="opponent-arg-title">${oppArg.title}</div>
+                                        <div style="font-size: 0.85em; color: #666; margin-top: 4px;">[${oppArg.type.toUpperCase()}]</div>
+                                    </div>
+                                </div>
+                            `;
+                            if (myRebuttal) {
+                                html += `
+                                    <div class="rebuttal-match">
+                                        <div class="rebuttal-match-title">✅ YOUR REBUTTAL: ${myRebuttal.title}</div>
+                                        <div style="margin-top: 5px; color: #065f46; font-size: 0.9em;">${myRebuttal.content}</div>
+                                    </div>
+                                `;
+                            } else {
+                                html += `
+                                    <div style="background: #fef3c7; padding: 8px; border-radius: 8px; margin-top: 8px; font-size: 0.85em; color: #92400e;">
+                                        ⚠️ No rebuttal prepared for this argument
+                                    </div>
+                                `;
+                            }
+                        }
+                    });
+
+                    html += `
+                            </div>
+                        </div>
+                    `;
+                }
             } else {
                 html += `
                     <div style="margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center;">
@@ -1160,6 +1541,7 @@
                         <button class="btn btn-primary" onclick="openModal('addEvidence')">+ Evidence</button>
                         <button class="btn btn-primary" onclick="openModal('addTurn')">+ Turn</button>
                         <button class="btn btn-primary" onclick="openModal('addCX')">+ CX Question</button>
+                        <button class="btn btn-success" onclick="openModal('addRebuttal')">+ Rebuttal</button>
                     </div>
                 `;
             }
@@ -1177,8 +1559,9 @@
                 filteredArgs.forEach(arg => {
                     const pinnedClass = arg.pinned ? 'pinned' : '';
                     const collapsedClass = arg.collapsed ? 'collapsed' : '';
+                    const rebuttalClass = arg.type === 'rebuttal' ? 'rebuttal' : '';
                     html += `
-                        <div class="argument-card ${pinnedClass} ${collapsedClass}">
+                        <div class="argument-card ${pinnedClass} ${collapsedClass} ${rebuttalClass}">
                             <div class="argument-header">
                                 <div class="argument-title">${arg.title}</div>
                                 <div class="argument-actions">
@@ -1197,7 +1580,6 @@
                     `;
 
                     if (arg.type === 'evidence') {
-                        // Get contention name
                         let contentionName = 'None';
                         if (arg.contentionId) {
                             const contention = args.find(a => a.id === parseInt(arg.contentionId));
@@ -1211,6 +1593,16 @@
                                 <div class="impact-label">IMPACT:</div>
                                 <div style="color: #555; line-height: 1.4;">${arg.impact}</div>
                                 <div class="contention-link">↪ Linked to: ${contentionName}</div>
+                            </div>
+                        `;
+                    } else if (arg.type === 'rebuttal') {
+                        const targetArg = opponentArgs.find(a => a.id === arg.targetArgId);
+                        const targetTitle = targetArg ? targetArg.title : 'Unknown';
+                        html += `
+                            <div class="rebuttal-info">
+                                <div class="rebuttal-label">REBUTTAL CONTENT:</div>
+                                <div style="color: #555; line-height: 1.4;">${arg.content}</div>
+                                <div class="rebuttal-target">🎯 Targets: ${targetTitle}</div>
                             </div>
                         `;
                     } else if (arg.content) {
@@ -1261,6 +1653,7 @@
 
         function backToResolutions() {
             data.currentResolution = null;
+            data.opponentUsedArgs = [];
             renderResolutions();
         }
 
@@ -1318,6 +1711,7 @@
 
         function exitRoundMode() {
             data.roundMode = false;
+            data.opponentUsedArgs = [];
             document.body.classList.remove('round-mode');
             renderArguments();
         }
